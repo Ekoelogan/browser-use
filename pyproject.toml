@@ -73,7 +73,7 @@ examples = [
     "imgcat>=0.6.0",
     # "stagehand-py>=0.3.6",
     # "browserbase>=0.4.0",
-    "langchain-openai>=0.3.35",
+    "langchain-openai>=1.1.9",
 ]
 eval = [
     "lmnr[all]==0.8.1",
