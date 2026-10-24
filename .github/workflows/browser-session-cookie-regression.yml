@@ -1,0 +1,37 @@
+name: browser-session-cookie-regression
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/browser-session-cookie-regression.yml'
+      - 'browser_use/browser/session.py'
+      - 'tests/test_browser_session_cookies.py'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cookie-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install project and test dependencies
+        run: uv sync --dev
+
+      - name: Run cookie regression test
+        run: uv run pytest tests/test_browser_session_cookies.py -q
