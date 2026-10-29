@@ -35,7 +35,13 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           if [[ -n "$DOCKER_USERNAME" && -n "$DOCKER_PASSWORD" ]]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' \
+              'available=true' \
+              'image=browseruse/browseruse' \
+              'cache_from=type=registry,ref=browseruse/browseruse:buildcache' \
+              'cache_to=type=registry,ref=browseruse/browseruse:buildcache,'\
+              'mode=max' \
+              >> "$GITHUB_OUTPUT"
           fi
 
       - name: Log in to Docker Hub
@@ -57,7 +63,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ steps.dockerhub.outputs.available == 'true' && 'browseruse/browseruse' || '' }}
+            ${{ steps.dockerhub.outputs.image }}
             ghcr.io/browser-use/browser-use
           tags: |
             type=ref,event=branch
@@ -76,5 +82,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=browseruse/browseruse:buildcache
-          cache-to: ${{ steps.dockerhub.outputs.available == 'true' && 'type=registry,ref=browseruse/browseruse:buildcache,mode=max' || '' }}
+          cache-from: ${{ steps.dockerhub.outputs.cache_from }}
+          cache-to: ${{ steps.dockerhub.outputs.cache_to }}
